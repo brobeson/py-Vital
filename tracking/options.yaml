@@ -11,7 +11,7 @@ padding: 16
 batch_pos: 32
 batch_neg: 96
 batch_neg_cand: 1024
-batch_test: 256
+batch_test: 32
 
 # candidates sampling
 n_samples: 256

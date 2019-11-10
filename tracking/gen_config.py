@@ -8,7 +8,7 @@ def gen_config(args):
     if args.seq != '':
         # generate config from a sequence name
 
-        seq_home = os.path.expanduser("~/Videos/otb")
+        seq_home = os.path.expanduser("~/Videos/otb/")
         result_home = './results'
 
         seq_name = args.seq
