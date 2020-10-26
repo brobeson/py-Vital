@@ -1,0 +1,22 @@
+[TYPECHECK]
+
+generated-members=
+    torch.from_numpy,
+    torch.cat,
+    torch.log,
+    torch.min,
+    torch.ones,
+    torch.stack,
+    torch.topk,
+    torch.zeros
+
+[MESSAGES CONTROL]
+disable=bad-continuation
+
+[BASIC]
+argument-rgx=[a-z_][a-z0-9_]*
+attr-rgx=[a-z_][a-z0-9_]*
+class-attribute-rgx=[a-z_][a-z0-9_]*
+function-rgx=[a-z_][a-z0-9_]*
+method-rgx=[a-z_][a-z0-9_]*
+variable-rgx=[a-z_][a-z0-9_]*

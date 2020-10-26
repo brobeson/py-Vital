@@ -19,7 +19,7 @@ def g_pretrain(model, model_g, criterion_g, pos_data):
     else:
         nBatches = n // opts['batch_gnet'] + 1
 
-    print(nBatches)
+    # print(nBatches)
 
     pos_data = pos_data.view(n, 512, 3, 3)
 
@@ -82,4 +82,4 @@ def g_pretrain(model, model_g, criterion_g, pos_data):
 
         objective[iter] = loss_g
         end = time.time()
-        print('asdn objective %.3f, %.2f s' % (objective.mean(), end - start))
+        # print('asdn objective %.3f, %.2f s' % (objective.mean(), end - start))
