@@ -68,13 +68,13 @@ momentum: 0.9
 w_decay: 0.0005
 
 # online learning rate scheduling
-# scheduler: "constant"
+scheduler: "constant"
 # scheduler: "cosine_annealing"
 # cosine_annealing:
 #   lr_min: 0.0
 # scheduler: "inverse_cosine_annealing"
 # inverse_cosine_annealing:
 #   lr_min: 0.0
-scheduler: "pada"
-alpha: 10.0
-lambda: 1.0
+# scheduler: "pada"
+# alpha: 10.0
+# lambda: 1.0

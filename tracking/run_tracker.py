@@ -135,7 +135,6 @@ def train(model, model_g, criterion, optimizer, scheduler, pos_feats, neg_feats,
         if 'grad_clip' in opts:
             torch.nn.utils.clip_grad_norm_(model.parameters(), opts['grad_clip'])
         optimizer.step()
-        scheduler.step()
 
         if model_g is not None:
             start = time.time()
@@ -174,6 +173,7 @@ def train(model, model_g, criterion, optimizer, scheduler, pos_feats, neg_feats,
             model_g.zero_grad()
             loss_g_2.backward()
             optimizer_g.step()
+            scheduler.step()
 
             end = time.time()
             # print('asdn objective %.3f, %.2f s' % (loss_g_2, end - start))
