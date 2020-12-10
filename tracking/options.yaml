@@ -1,7 +1,7 @@
 use_gpu: true
 
 # model path
-model_path: "./models/mdnet_vot-otb.pth"
+model_path: "models/mdnet_imagenet_vid.pth"
 
 # input size
 img_size: 107
@@ -11,7 +11,7 @@ padding: 16
 batch_pos: 32
 batch_neg: 96
 batch_neg_cand: 1024
-batch_test: 32
+batch_test: 256
 
 # candidates sampling
 n_samples: 256
@@ -61,20 +61,19 @@ lr_mult: {'fc6': 10}
 ft_layers: ['fc']
 
 # NetG
-lr_g: 0.0002
+lr_g: 1.0
 maxiter_g: 50
-batch_gnet: 32
+batch_gnet: 256
 momentum: 0.9
 w_decay: 0.0005
 
 # online learning rate scheduling
-scheduler: "constant"
-# scheduler: "cosine_annealing"
-# cosine_annealing:
-#   lr_min: 0.0
-# scheduler: "inverse_cosine_annealing"
-# inverse_cosine_annealing:
-#   lr_min: 0.0
-# scheduler: "pada"
-# alpha: 10.0
-# lambda: 1.0
+schedule: gamma
+direction: decreasing
+minimum_rate: 0.0
+maximum_rate: 0.0002
+constant: 0.0002
+pada:
+  alpha: 10.0
+  lambda: 1.0
+gamma: 0.15

@@ -206,13 +206,13 @@ def run_vital(img_list, init_bbox, gt=None, savefig_dir='', display=False):
     model_g.set_learnable_params(opts['ft_layers'])
     init_optimizer = set_optimizer(model, opts['lr_init'], opts['lr_mult'])
     update_optimizer = set_optimizer(model, opts['lr_update'], opts['lr_mult'])
-    if "scheduler" in opts:
+    if "schedule" in opts:
         update_scheduler = tracking.domain_adaptation_schedules.make_schedule(
             update_optimizer,
             **opts
         )
     else:
-         update_scheduler = tracking.domain_adaptation_schedules.make_schedule(update_optimizer, scheduler="constant")
+        update_scheduler = tracking.domain_adaptation_schedules.make_schedule(update_optimizer, schedule="constant")
 
     tic = time.time()
     # Load first image
@@ -234,7 +234,7 @@ def run_vital(img_list, init_bbox, gt=None, savefig_dir='', display=False):
     neg_feats = forward_samples(model, image, neg_examples)
 
     # Initial training
-    scheduler = tracking.domain_adaptation_schedules.make_schedule(init_optimizer, scheduler="constant")
+    scheduler = tracking.domain_adaptation_schedules.make_schedule(init_optimizer, schedule="constant", constant=1.0)
     train(model, None, criterion, init_optimizer, scheduler, pos_feats, neg_feats, opts['maxiter_init'])
     del init_optimizer, neg_feats, scheduler
     torch.cuda.empty_cache()
@@ -300,6 +300,8 @@ def run_vital(img_list, init_bbox, gt=None, savefig_dir='', display=False):
         # Estimate target bbox
         samples = sample_generator(target_bbox, opts['n_samples'])
         sample_scores = forward_samples(model, image, samples, out_layer='fc6')
+        if torch.any(torch.isnan(sample_scores)):
+            raise RuntimeError("MDNet calculated NaN for scores.")
 
         top_scores, top_idx = sample_scores[:, 1].topk(5)
         top_idx = top_idx.cpu()
