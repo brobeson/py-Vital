@@ -19,7 +19,7 @@ from modules.utils import overlap_ratio
 from tracking.data_prov import RegionExtractor
 from tracking.bbreg import BBRegressor
 from tracking.gen_config import gen_config
-import tracking.domain_adaptation_schedules
+import tracking.lr_schedules
 
 sys.path.insert(0,'./gnet')
 from gnet.g_init import NetG, set_optimizer_g
@@ -43,7 +43,7 @@ def forward_samples(model, image, samples, out_layer='conv3'):
     return feats
 
 
-def train(model, model_g, criterion, optimizer, scheduler, pos_feats, neg_feats, maxiter, in_layer='fc4'):
+def train(model, model_g, criterion, optimizer, pos_feats, neg_feats, maxiter, in_layer='fc4'):
     model.train()
 
     batch_pos = opts['batch_pos']
@@ -162,6 +162,11 @@ def train(model, model_g, criterion, optimizer, scheduler, pos_feats, neg_feats,
             col = idx % 3
 
             optimizer_g = set_optimizer_g(model_g)
+            scheduler = tracking.lr_schedules.make_schedule(
+                optimizer_g,
+                opts["direction"],
+                opts,
+            )
             labels = torch.ones(batch_pos, 1, 3, 3)
             labels[:, :, col, row] = 0
 
@@ -180,7 +185,6 @@ def train(model, model_g, criterion, optimizer, scheduler, pos_feats, neg_feats,
 
 
 def run_vital(img_list, init_bbox, gt=None, savefig_dir='', display=False):
-
     # Init bbox
     target_bbox = np.array(init_bbox)
     result = np.zeros((len(img_list), 4))
@@ -206,13 +210,6 @@ def run_vital(img_list, init_bbox, gt=None, savefig_dir='', display=False):
     model_g.set_learnable_params(opts['ft_layers'])
     init_optimizer = set_optimizer(model, opts['lr_init'], opts['lr_mult'])
     update_optimizer = set_optimizer(model, opts['lr_update'], opts['lr_mult'])
-    if "schedule" in opts:
-        update_scheduler = tracking.domain_adaptation_schedules.make_schedule(
-            update_optimizer,
-            **opts
-        )
-    else:
-        update_scheduler = tracking.domain_adaptation_schedules.make_schedule(update_optimizer, schedule="constant")
 
     tic = time.time()
     # Load first image
@@ -234,9 +231,8 @@ def run_vital(img_list, init_bbox, gt=None, savefig_dir='', display=False):
     neg_feats = forward_samples(model, image, neg_examples)
 
     # Initial training
-    scheduler = tracking.domain_adaptation_schedules.make_schedule(init_optimizer, schedule="constant", constant=1.0)
-    train(model, None, criterion, init_optimizer, scheduler, pos_feats, neg_feats, opts['maxiter_init'])
-    del init_optimizer, neg_feats, scheduler
+    train(model, None, criterion, init_optimizer, pos_feats, neg_feats, opts['maxiter_init'])
+    del init_optimizer, neg_feats
     torch.cuda.empty_cache()
     g_pretrain(model, model_g, criterion_g, pos_feats)
     torch.cuda.empty_cache()
@@ -351,13 +347,13 @@ def run_vital(img_list, init_bbox, gt=None, savefig_dir='', display=False):
             nframes = min(opts['n_frames_short'], len(pos_feats_all))
             pos_data = torch.cat(pos_feats_all[-nframes:], 0)
             neg_data = torch.cat(neg_feats_all, 0)
-            train(model, None, criterion, update_optimizer, update_scheduler, pos_data, neg_data, opts['maxiter_update'])
+            train(model, None, criterion, update_optimizer, pos_data, neg_data, opts['maxiter_update'])
 
         # Long term update
         elif i % opts['long_interval'] == 0:
             pos_data = torch.cat(pos_feats_all, 0)
             neg_data = torch.cat(neg_feats_all, 0)
-            train(model, model_g, criterion, update_optimizer, update_scheduler, pos_data, neg_data, opts['maxiter_update'])
+            train(model, model_g, criterion, update_optimizer, pos_data, neg_data, opts['maxiter_update'])
 
         torch.cuda.empty_cache()
         spf = time.time() - tic

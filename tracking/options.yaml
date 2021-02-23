@@ -68,12 +68,13 @@ momentum: 0.9
 w_decay: 0.0005
 
 # online learning rate scheduling
-schedule: gamma
-direction: decreasing
+schedule: pada
+direction: increasing
 minimum_rate: 0.0
-maximum_rate: 0.0002
-constant: 0.0002
+gamma:
+    gamma: 0.15
 pada:
-  alpha: 10.0
-  lambda: 1.0
-gamma: 0.15
+    lambda: 1.0
+    alpha: 10.0
+exponential:
+    gamma: 0.965

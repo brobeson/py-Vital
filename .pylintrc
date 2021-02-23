@@ -1,8 +1,9 @@
 [TYPECHECK]
 
 generated-members=
-    torch.from_numpy,
+    torch.any
     torch.cat,
+    torch.from_numpy,
     torch.log,
     torch.min,
     torch.ones,
