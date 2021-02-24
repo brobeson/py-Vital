@@ -40,14 +40,3 @@ overlaps = [
     for box, groundtruth in zip(boxes, groundtruth_boxes[1:])
 ]
 print("Mean IOU:", statistics.mean(overlaps))
-
-with open("results/Deer/result_new.json", "w") as json_file:
-    json.dump(
-        {
-            "res": [box.round().tolist() for box in boxes],
-            "type": "rect",
-            "fps": 0.4723471048713186,
-        },
-        json_file,
-        indent=2,
-    )

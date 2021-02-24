@@ -78,6 +78,12 @@ def train(
     pos_pointer = 0
     neg_pointer = 0
 
+    if model_g is not None:
+        optimizer_g = set_optimizer_g(model_g)
+        scheduler = tracking.lr_schedules.make_schedule(
+            optimizer_g, opts["direction"], opts,
+        )
+
     for _ in range(maxiter):
         # select pos idx
         pos_next = pos_pointer + batch_pos
@@ -180,10 +186,6 @@ def train(
             row = idx // 3
             col = idx % 3
 
-            optimizer_g = set_optimizer_g(model_g)
-            scheduler = tracking.lr_schedules.make_schedule(
-                optimizer_g, opts["direction"], opts,
-            )
             labels = torch.ones(batch_pos, 1, 3, 3)
             labels[:, :, col, row] = 0
 

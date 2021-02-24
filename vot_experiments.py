@@ -9,7 +9,7 @@ import tracking.got10k_tracker
 reporter = slack_message.ExperimentReporter(
     source="Laptop", channel="learning-rate-research"
 )
-reporter.send_message("Starting MDNet VOT2019 experiments.")
+reporter.send_message("Starting VITAL VOT2019 experiments.")
 
 configurations = [
     {"schedule": "constant"},
