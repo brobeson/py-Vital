@@ -1,6 +1,5 @@
 import time
 import sys
-import yaml
 
 import numpy as np
 import torch as t
@@ -9,9 +8,7 @@ import torch.nn.functional as F
 sys.path.insert(0, './gnet')
 from g_init import set_optimizer_g
 
-opts = yaml.safe_load(open('./tracking/options.yaml','r'))
-
-def g_pretrain(model, model_g, criterion_g, pos_data):
+def g_pretrain(model, model_g, criterion_g, pos_data, opts):
     # Evaluate mask
     n = pos_data.size(0)
     if n % opts['batch_gnet'] == 0:
